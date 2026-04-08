@@ -1,42 +1,43 @@
 ﻿using System;
-
-class Singleton
-{
-    private static Singleton instance;
-
-    private Singleton()
-    {
-        Console.WriteLine("Tao instance");
-    }
-
-    public static Singleton GetInstance()
-    {
-        if (instance == null)
-        {
-            instance = new Singleton();
-        }
-        return instance;
-    }
-
-    public void ShowMessage()
-    {
-        Console.WriteLine("Hello!");
-    }
-}
+using Microsoft.Data.SqlClient;
 
 class Program
 {
     static void Main()
     {
-        Singleton s1 = Singleton.GetInstance();
-        Singleton s2 = Singleton.GetInstance();
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.InputEncoding = System.Text.Encoding.UTF8;
+        string connStr = "Server=.\\SQLEXPRESS01;Database=TestADO;Trusted_Connection=True;TrustServerCertificate=True";
 
-        s1.ShowMessage();
-        s2.ShowMessage();
+        SqlConnection conn = new SqlConnection(connStr);
 
-        if (s1 == s2)
+        try
         {
-            Console.WriteLine("Cung instance!");
+            conn.Open();
+            Console.WriteLine("Ket noi thanh cong!");
+
+            string sql = "SELECT * FROM SinhVien";
+            SqlCommand cmd = new SqlCommand(sql, conn);
+
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Console.WriteLine("ID: " + reader["id"]);
+                Console.WriteLine("Name: " + reader["name"]);
+                Console.WriteLine("Age: " + reader["age"]);
+                Console.WriteLine("-------------------");
+            }
+
+            reader.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Loi: " + ex.Message);
+        }
+        finally
+        {
+            conn.Close();
         }
     }
 }
